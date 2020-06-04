@@ -57,9 +57,6 @@ namespace project_test
                     ValidateAudience = false
                 };
             });
-            // services.AddDbContext<StudentContext>(options =>
-            //     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            
     
             services.AddScoped<IAuthService, AuthService>();
         }
