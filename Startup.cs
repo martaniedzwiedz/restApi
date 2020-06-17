@@ -17,6 +17,7 @@ using project_test.Helpers;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using project_test.Services.Auth;
+using restApi.Models;
 
 namespace project_test
 {
@@ -58,6 +59,8 @@ namespace project_test
                 };
             });
     
+            services.AddDbContext<ModelsContext>(options =>
+              options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IAuthService, AuthService>();
         }
 

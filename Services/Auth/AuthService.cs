@@ -8,27 +8,25 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using project_test.FacadeModels.Auth;
 using project_test.Helpers;
-using project_test.Models;
+using restApi.Models;
 
 namespace project_test.Services.Auth
 {
     public class AuthService : IAuthService
     {
 
-          private List<UserEntity> _users = new List<UserEntity>
-        { 
-            new UserEntity { Id = 1, FirstName = "Test", LastName = "User", Email = "test", Password = "test" } 
-        };
-
         private readonly AppSettings _appSettings;
-        public AuthService(IOptions<AppSettings> appSettings)
+        private readonly ModelsContext _modelsContext;
+        public AuthService(IOptions<AppSettings> appSettings, ModelsContext modelsContext)
         {
             _appSettings = appSettings.Value;
+            _modelsContext = modelsContext;
         }
 
         public AuthResponse Authenticate(AuthRequest authorizationRequest)
         {
-            var user = _users.SingleOrDefault(x => x.Email == authorizationRequest.Email && x.Password == authorizationRequest.Password);
+          
+            var user = _modelsContext.Users.SingleOrDefault(x  => x.Email == authorizationRequest.Email && x.Password == authorizationRequest.Password);
 
             if (user == null)
               return null;
