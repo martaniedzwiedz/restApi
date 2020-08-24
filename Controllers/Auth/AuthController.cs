@@ -1,7 +1,10 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using project_test.FacadeModels.Auth;
+using project_test.Models;
 using project_test.Services.Auth;
+using restApi.FacadeModels;
 
 namespace project_test.Controllers.Authorization
 {
@@ -14,13 +17,23 @@ namespace project_test.Controllers.Authorization
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody]AuthRequest model)
+        public async Task<ActionResult> Authenticate([FromBody]AuthRequest model)
         {
-            var token = _service.Authenticate(model);
+            var token = await _service.Authenticate(model);
 
             if (token == null)
-                return Unauthorized(new {message = "Wrong credential provided"});
+                return Unauthorized(new {error = 401, message = "Wrong credential provided"});
             return Ok(token);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("registration")]
+        public async Task<IActionResult> Registration([FromBody]RegisterRequest model)
+        {
+            var user = await _service.Register(model);
+            if(user == null)
+                return Conflict(new {error = 409, message = "User already exist"});
+            else return Ok(user);
         }
     }
 }

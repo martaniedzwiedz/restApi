@@ -4,10 +4,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using project_test.FacadeModels.Auth;
 using project_test.Helpers;
+using project_test.Models;
+using restApi.FacadeModels;
 using restApi.Models;
 
 namespace project_test.Services.Auth
@@ -23,10 +27,10 @@ namespace project_test.Services.Auth
             _modelsContext = modelsContext;
         }
 
-        public AuthResponse Authenticate(AuthRequest authorizationRequest)
+        public async Task<AuthResponse> Authenticate(AuthRequest authorizationRequest)
         {
           
-            var user = _modelsContext.Users.SingleOrDefault(x  => x.Email == authorizationRequest.Email && x.Password == authorizationRequest.Password);
+            var user = await _modelsContext.Users.SingleOrDefaultAsync(x  => x.Email == authorizationRequest.Email && x.Password == authorizationRequest.Password);
 
             if (user == null)
               return null;
@@ -49,6 +53,22 @@ namespace project_test.Services.Auth
             authResponse.Token = tokenHandler.WriteToken(token);
         
             return authResponse;
+        }
+
+        public async Task<UserEntity> Register(RegisterRequest user)
+        {
+            var checkedUser = await _modelsContext.Users.SingleOrDefaultAsync(x  => x.Email == user.Email);
+            if(checkedUser == null){
+                var newUser = new UserEntity();
+                newUser.Email = user.Email;
+                newUser.Password = user.Password;
+                newUser.FirstName = user.FirstName;
+                newUser.LastName = user.LastName;
+               await _modelsContext.Users.AddAsync(newUser);
+               await _modelsContext.SaveChangesAsync();
+                return newUser;
+            }
+           return null;
         }
     }
 }
